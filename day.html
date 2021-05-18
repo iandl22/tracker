@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>WorkForce</title>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/photon.css">
+  </head>
+  <body>
+    <div class="window">    
+      <div class="window-content">
+        <div class="pane-group">
+          <div class="pane-sm sidebar">
+            <nav class="nav-group">
+              <h5 class="nav-group-title">Menu</h5>
+              <a class="nav-group-item" href="index.html">
+                <span class="icon icon-home"></span>
+                Home
+              </a>
+              <a class="nav-group-item active" href="calendar.html">
+                <span class="icon icon-calendar"></span>
+                Calendar
+              </a>
+              <span class="nav-group-item">
+                <span class="icon icon-cog"></span>
+                Settings
+              </span>            
+            </nav>
+            
+          </div>
+          <div class="pane">
+            <h3>Showing activites for <span id="date"></span></h3>
+            <div id="activites">              
+                <img class="loading" src="./images/ajax-loader.gif">
+              </div>
+          </div>
+        </div>
+      </div>    
+    </div>
+  </body>
+  <script>
+      window.$ = window.jQuery = require('jquery')
+      const Activity = require('./Activity') 
+    var activity = new Activity()
+      $(document).ready(function(){
+        var urlParams = new URLSearchParams(window.location.search);
+        $("#date").html(new Date(urlParams.get("date")).toLocaleDateString('en-GB'))
+
+        let activites = activity.formatActivities( activity.byDay( new Date(urlParams.get("date")).toISOString().slice(0,10)) )
+        var html = '<ul class="list-group">'
+
+        for (i = 0; i < activites.length; i++) {
+            var hours = Math.floor(activites[i].time / 60);          
+            var minutes = activites[i].time % 60;
+            
+            html += '<li class="list-group-item clickable"><div class="media-body clickable"><strong class="clickable">' + activites[i].title + "</strong> <p class='clickable'>" + hours + 'h ' + minutes +"m  </p></div>"
+            
+            html += "<ul style='display:none'>"
+            for (x = 0; x < activites[i].subActivity.length; x++) {
+                if (activites[i].subActivity[x].title != "") {
+                var hours = Math.floor(activites[i].subActivity[x].time / 60);          
+                var minutes = activites[i].subActivity[x].time % 60;
+
+                html += '<li class="list-group-item"><div class="media-body"><strong>' + activites[i].subActivity[x].title + '</strong> <p>' + hours + 'h ' + minutes + 'm </p></div></li>'
+                }            
+            }
+
+            html += '</ul>'            
+            
+            html += '</li>'
+        }
+
+        document.getElementById("activites").innerHTML = html + "</ul>"
+
+        $('#activites').on('click', '.list-group-item' ,function(){
+            $(this).find("ul").slideToggle();
+        });
+        
+      });
+  </script>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>WorkForce</title>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/photon.css">
+  </head>
+  <body>
+    <div class="window">    
+      <div class="window-content">
+        <div class="pane-group"></div>
+          <object data="menu.html"></object> 
+        
+          <div class="pane">
+            <h3>Todays Activites</h3>
+            <div id="activites">              
+              <img class="loading" src="./images/ajax-loader.gif">
+            </div>
+          </div>
+        </div>
+      </div>    
+    </div>
+  </body>
+
+  <script>
+    window.$ = window.jQuery = require('jquery')
+    const { ipcRenderer } = require('electron')  
+    const Activity = require('./Activity') 
+    var activity = new Activity()
+    
+    $(document).ready(function(){
+      updateView()
+    });
+
+    ipcRenderer.on('updateView', (event, message) => {      
+      updateView()
+    })
+
+    function updateView()
+    {
+      let activites = activity.formatActivities( activity.byDay( new Date().toISOString().slice(0,10)) )
+      var html = '<ul class="list-group">'
+
+      for (i = 0; i < activites.length; i++) {
+        var hours = Math.floor(activites[i].time / 60);          
+        var minutes = activites[i].time % 60;
+
+
+        html += '<li class="list-group-item clickable"><div class="media-body clickable"><strong class="clickable">' + activites[i].title + "</strong> <p class='clickable'>" + hours + 'h ' + minutes +"m  </p></div>"
+        
+        html += "<ul style='display:none'>"
+          for (x = 0; x < activites[i].subActivity.length; x++) {
+            if (activites[i].subActivity[x].title != "") {
+              var hours = Math.floor(activites[i].subActivity[x].time / 60);          
+              var minutes = activites[i].subActivity[x].time % 60;
+
+              html += '<li class="list-group-item"><div class="media-body"><strong>' + activites[i].subActivity[x].title + '</strong> <p>' + hours + 'h ' + minutes + 'm </p></div></li>'
+            }            
+          }
+
+        html += '</ul>'            
+        
+        html += '</li>'
+      }
+
+      document.getElementById("activites").innerHTML = html + "</ul>"
+    }
+
+    $('#activites').on('click', '.list-group-item' ,function(){
+      $(this).find("ul").slideToggle();
+    });
+
+  </script>
+  
+</html>

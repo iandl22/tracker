@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>WorkForce</title>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/photon.css">
+  </head>
+  <body>
+    <div class="window">    
+      <div class="window-content">
+        <div class="pane-group">
+          <div class="pane-sm sidebar">
+            <nav class="nav-group">
+              <h5 class="nav-group-title">Menu</h5>
+              <a class="nav-group-item active">
+                <span class="icon icon-home"></span>
+                Home
+              </a>
+              <a class="nav-group-item">
+                <span class="icon icon-calendar"></span>
+                Calendar
+              </a>
+              <span class="nav-group-item">
+                <span class="icon icon-cog"></span>
+                Settings
+              </span>            
+            </nav>
+            
+          </div>
+          <div class="pane">
+            <h3>We need the following permissions to track you activties</h3>
+            
+            <ul>
+                <li>
+                    Accessibility: 
+                    <span id="accessibility-toggle">
+                        Disabled 
+                        <input type='button' value='Enable Now' onclick='requestAccessability()'>
+                    </span>
+                </li>
+                <li>
+                    Screen Recording: 
+                    <span id="screen-recording-toggle">
+                        Disabled 
+                        <input type='button' value='Enable Now' onclick='requestScreenRecording()'>
+                    </span>
+                </li>
+            </ul>
+
+
+          </div>
+        </div>
+      </div>    
+    </div>
+  </body>
+
+    <script>
+        window.$ = window.jQuery = require('jquery')
+        const { ipcRenderer } = require('electron')
+
+        const pemissionsLoop = setInterval(function(){
+            var permissions = ipcRenderer.sendSync('get-permissions', '')
+
+            if (permissions.accessibility && permissions.screen == "granted") {
+                window.location.href = 'index.html'
+            } else {                                      
+                if (permissions.accessibility) {
+                    $("#accessibility-toggle").html("Enabled")
+                } else {
+                    $("#accessibility-toggle").html("Disabled <input type='button' value='Enable Now' onclick='requestAccessability()'>")
+                }
+                            
+                if (permissions.screen == "granted") {
+                    $("#screen-recording-toggle").html("Enabled")            
+                } else {
+                    $("#screen-recording-toggle").html("Disabled <input type='button' value='Enable Now' onclick='requestScreenRecording()'>")
+                }
+            }
+        },1000)
+
+
+        function requestAccessability()
+        {
+            ipcRenderer.sendSync('request-accessability', '')
+        }
+
+        function requestScreenRecording()
+        {
+            ipcRenderer.sendSync('request-screen', '')
+        }
+    </script>
+</html>

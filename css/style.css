@@ -1,0 +1,24 @@
+@font-face {
+    font-family: "noto";
+    src: url("./fonts/NotoSerif-Regular.ttf");
+}
+body {
+    background-color: #f1f1f1;
+    color: #000000;
+    font-family: "noto";
+}
+
+.clickable {
+   cursor: pointer !important; 
+}
+.loading {
+    height: 25px;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    width: 25px;
+}
+.pane{
+    padding-left: 20px;
+    padding-right: 20px;
+}
